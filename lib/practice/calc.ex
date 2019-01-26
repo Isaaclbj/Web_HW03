@@ -9,16 +9,64 @@ defmodule Practice.Calc do
     # but doesn't need to handle parens.
     expr
     |> String.split(~r/\s+/)
+    |> intoTokens
+    |> findMultiDiv
+    |> findPlusMi
     |> hd
-    |> parse_float
-    |> :math.sqrt()
-
-    # Hint:
-    # expr
-    # |> split
-    # |> tag_tokens  (e.g. [+, 1] => [{:op, "+"}, {:num, 1.0}]
-    # |> convert to postfix
-    # |> reverse to prefix
-    # |> evaluate as a stack calculator using pattern matching
+    |> tupleToNum
   end
+
+  def intoTokens(los) do
+    IO.inspect(los)
+    Enum.map(los, fn(s) -> toTuple(s) end)
+  end
+
+  def toTuple(s) do
+    if Enum.member?(["+", "-", "*", "/"], s) do
+      {:operator, s}
+    else
+      {:number, parse_float(s)}
+    end
+  end
+
+  def findMultiDiv([{:number, s1}, {:operator, "*"},
+    {:number, s3} | rest]) do
+    findMultiDiv([{:number, s1 * s3} | rest])
+  end
+
+  def findMultiDiv([{:number, s1}, {:operator, "/"},
+    {:number, s3} | rest]) do
+    findMultiDiv([{:number, s1 / s3} | rest])
+  end
+
+  def findMultiDiv([first | rest]) do
+    [first] ++ findMultiDiv(rest)
+  end
+
+  def findMultiDiv([]) do
+    []
+  end
+
+  def findPlusMi([{:number, s1}, {:operator, "+"},
+    {:number, s3} | rest]) do
+    findPlusMi([{:number, s1 + s3} | rest])
+  end
+
+  def findPlusMi([{:number, s1}, {:operator, "-"},
+    {:number, s3} | rest]) do
+    findPlusMi([{:number, s1 - s3} | rest])
+  end
+
+  def findPlusMi([first | rest]) do
+    [first] ++ findMultiDiv(rest)
+  end
+
+  def findPlusMi([]) do
+    []
+  end
+
+  def tupleToNum(num) do
+    elem(num, 1)
+  end
+
 end

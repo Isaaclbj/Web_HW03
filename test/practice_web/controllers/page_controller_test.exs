@@ -3,7 +3,7 @@ defmodule PracticeWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"
-    assert html_response(conn, 200) =~ "cs3650"
+    assert html_response(conn, 200) =~ "cs4550"
   end
 
   test "double 5", %{conn: conn} do
@@ -21,5 +21,8 @@ defmodule PracticeWeb.PageControllerTest do
     assert html_response(conn, 200) =~ "17"
   end
 
-  # TODO: Write a controller test for palindrome.
+  test "palindrome aa", %{conn: conn} do
+    conn = post conn, "/palindrome", %{"s" => "aa"}
+    assert html_response(conn, 200) =~ "true"
+  end
 end
